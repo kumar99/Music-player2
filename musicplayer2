@@ -1,0 +1,51 @@
+class Mp3Filter implements FilenameFilter {
+	public boolean accept(File dir, String name) {
+		return (name.endsWith(".mp3"));
+	}
+}
+
+public class musicplayer2 extends ListActivity {
+
+	public static final String MEDIA_PATH = new String("/sdcard/");
+	private List<String> songs = new ArrayList<String>();
+	private MDSInterface mpInterface;
+	
+	@Override
+	public void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		setContentView(R.layout.main);
+		this.bindService(new Intent(musicplayer2.this,MDService.class), 
+				null, mConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	public void updateSongList() {
+		try {
+			File home = new File(MEDIA_PATH);
+			File fileList[] = home.listFiles(new Mp3Filter());
+			mpInterface.clearPlaylist();
+			if (fileList != null) {
+				for (File file : fileList ) {
+					songs.add(file.getName());
+					mpInterface.addSongPlaylist(file.getName());
+				}
+		
+				ArrayAdapter<String> songList = new ArrayAdapter<String>(this,
+						R.layout.song_item, songs);
+				setListAdapter(songList);
+			}
+		} catch(DeadObjectException e) {
+			Log.e(getString(R.string.app_name), e.getMessage());
+		}
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		try {
+			Intent intent = new Intent(this, ControlsMenu.class);
+			startSubActivity(intent,0);
+			mpInterface.playFile(position);
+		} catch(DeadObjectException e) {
+			Log.e(getString(R.string.app_name), e.getMessage());
+		}
+	}
+	
