@@ -38,14 +38,3 @@ public class musicplayer2 extends ListActivity {
 		}
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		try {
-			Intent intent = new Intent(this, ControlsMenu.class);
-			startSubActivity(intent,0);
-			mpInterface.playFile(position);
-		} catch(DeadObjectException e) {
-			Log.e(getString(R.string.app_name), e.getMessage());
-		}
-	}
-	
